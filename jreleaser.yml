@@ -38,7 +38,7 @@ assemble:
       formats: [ ZIP ]
       attachPlatform: true
       fileSets:
-        - input: 'target/{{Env.RUSTUP_TARGET}}/release'
+        - input: 'target/{{env.RUSTUP_TARGET}}/release'
           output: 'bin'
           includes: [ 'jreleaser-poc{.exe,}' ]
         - input: '.'
