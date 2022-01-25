@@ -1,0 +1,135 @@
+name: EarlyAccess
+
+# Build on every push to main
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: true
+      matrix:
+        job:
+          - { target: aarch64-unknown-linux-gnu   , os: ubuntu-20.04, use-cross: true }
+          - { target: aarch64-apple-darwin        , os: macos-10.15, use-cross: true  }
+          - { target: x86_64-apple-darwin         , os: macos-10.15                   }
+          - { target: x86_64-pc-windows-msvc      , os: windows-2019                  }
+          - { target: x86_64-unknown-linux-gnu    , os: ubuntu-20.04                  }
+    runs-on: ${{ matrix.job.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install prerequisites
+        shell: bash
+        run: |
+          case ${{ matrix.job.target }} in
+            arm-unknown-linux-*) sudo apt-get -y update ; sudo apt-get -y install gcc-arm-linux-gnueabihf ;;
+            aarch64-unknown-linux-gnu) sudo apt-get -y update ; sudo apt-get -y install gcc-aarch64-linux-gnu ;;
+          esac
+
+      # Configure the Rust toolchain
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.job.target }}
+          override: true
+          profile: minimal # minimal component installation (ie, no documentation)
+
+      - name: Show version information (Rust, cargo, GCC)
+        shell: bash
+        run: |
+          gcc --version || true
+          rustup -V
+          rustup toolchain list
+          rustup default
+          cargo -V
+          rustc -V
+
+      - name: Build
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: ${{ matrix.job.use-cross }}
+          command: build
+          args: --locked --release --target=${{ matrix.job.target }}
+
+      # Read project version from file
+      - name: Version
+        id: version
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: VERSION
+          trim: true
+
+      # Assemble the zipball
+      - name: Assemble
+        uses: jreleaser/release-action@v2
+        with:
+          version: early-access
+          arguments: assemble
+        env:
+          JRELEASER_PROJECT_VERSION: ${{ steps.version.outputs.content }}
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Upload archive
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts
+          path: |
+            out/jreleaser/assemble/helloworld/archive/*.zip
+
+      - name: JReleaser output
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: jreleaser-${{ matrix.job.os }}-${{ matrix.job.target }}
+          path: |
+            out/jreleaser/trace.log
+            out/jreleaser/output.properties
+
+  # Release all archives
+  release:
+    needs: [ build ]
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout with full history
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      # Download all collected archives
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+
+      # Read project version from file
+      - name: Version
+        id: version
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: VERSION
+          trim: true
+
+      # Release it!
+      - name: Release
+        uses: jreleaser/release-action@v2
+        with:
+          version: early-access
+          arguments: release -PartifactsDir=artifacts -PskipArchiveResolver
+        env:
+          JRELEASER_PROJECT_VERSION: ${{ steps.version.outputs.content }}
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: JReleaser output
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: jreleaser-release
+          path: |
+            out/jreleaser/trace.log
+            out/jreleaser/output.properties

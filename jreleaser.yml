@@ -1,0 +1,62 @@
+environment:
+  properties:
+    artifactsDir: out/jreleaser/assemble/jreleaser-poc/archive
+
+project:
+  name: jreleaser-poc
+  description: PoC for JReleaser
+  longDescription: A Rust sample project for testing release process using JReleaser
+  website: https://github.com/manojkarthick/jreleaser
+  authors:
+    - Manoj Karthick
+  license: MIT
+  extraProperties:
+    inceptionYear: 2022
+
+platform:
+  replacements:
+    'osx-x86_64': 'x86_64-apple-darwin'
+    'osx-aarch_64': 'aarch64-apple-darwin'
+    'linux-x86_64': 'x86_64-unknown-linux-gnu'
+    'linux-aarch_64': 'aarch64-unknown-linux-gnu'
+    'windows-x86_64': 'x86_64-pc-windows-msvc'
+
+release:
+  github:
+    name: jreleaser-poc
+    overwrite: true
+    changelog:
+      formatted: ALWAYS
+      format: '- {{commitShortHash}} {{commitTitle}}'
+      preset: conventional-commits
+      contributors:
+        format: '- {{contributorName}}{{#contributorUsernameAsLink}} ({{.}}){{/contributorUsernameAsLink}}'
+
+assemble:
+  archive:
+    jreleaser-poc:
+      active: ALWAYS
+      formats: [ TAR_GZ, ZIP ]
+      attachPlatform: true
+      fileSets:
+        - input: 'target/release'
+          output: 'bin'
+          includes: [ 'jreleaser-poc{.exe,}' ]
+        - input: '.'
+          includes: [ 'LICENSE' ]
+
+distributions:
+  jreleaser-poc:
+    type: BINARY
+    executableExtension: exe
+    artifacts:
+      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-x86_64-apple-darwin.tar.gz'
+        platform: 'osx-x86_64'
+      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-aarch64-apple-darwin.tar.gz'
+        platform: 'osx-aarch_64'
+      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-x86_64-unknown-linux-gnu.zip'
+        platform: 'linux-x86_64'
+      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-aarch64-unknown-linux-gnu.zip'
+        platform: 'linux-aarch_64'
+      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-x86_64-pc-windows-msvc.zip'
+        platform: 'windows-x86_64'
