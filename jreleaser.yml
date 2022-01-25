@@ -36,7 +36,7 @@ assemble:
   archive:
     jreleaser-poc:
       active: ALWAYS
-      formats: [ TAR_GZ, ZIP ]
+      formats: [ ZIP ]
       attachPlatform: true
       fileSets:
         - input: 'target/release'
@@ -50,9 +50,9 @@ distributions:
     type: BINARY
     executableExtension: exe
     artifacts:
-      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-x86_64-apple-darwin.tar.gz'
+      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-x86_64-apple-darwin.zip'
         platform: 'osx-x86_64'
-      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-aarch64-apple-darwin.tar.gz'
+      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-aarch64-apple-darwin.zip'
         platform: 'osx-aarch_64'
       - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-x86_64-unknown-linux-gnu.zip'
         platform: 'linux-x86_64'
