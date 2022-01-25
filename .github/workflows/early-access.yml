@@ -64,6 +64,7 @@ jobs:
         env:
           JRELEASER_PROJECT_VERSION: ${{ steps.version.outputs.content }}
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUSTUP_TARGET: ${{ matrix.os.target }}
 
       # Upload archive
       - name: Upload artifacts
