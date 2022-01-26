@@ -52,13 +52,30 @@ distributions:
     type: BINARY
     executableExtension: exe
     artifacts:
-      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-x86_64-apple-darwin.tar.gz'
+      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-x86_64-apple-darwin.zip'
         platform: 'osx-x86_64'
-      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-aarch64-apple-darwin.tar.gz'
+      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-aarch64-apple-darwin.zip'
         platform: 'osx-aarch_64'
-      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-x86_64-unknown-linux-gnu.tar.gz'
+      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-x86_64-unknown-linux-gnu.zip'
         platform: 'linux-x86_64'
-      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-aarch64-unknown-linux-gnu.tar.gz'
+      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-aarch64-unknown-linux-gnu.zip'
         platform: 'linux-aarch_64'
       - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-x86_64-pc-windows-msvc.zip'
         platform: 'windows-x86_64'
+  jreleaser-brew:
+    brew:
+      active: ALWAYS
+      continueOnError: false
+      formulaName: JReleaserPoC
+      multiPlatform: true
+      commitAuthor:
+        name: jreleaserbot
+        email: jreleaser@kordamp.org
+      tap:
+        active: ALWAYS
+        owner: manojkarthick
+        name: homebrew-tap
+        username: manojkarthick
+      cask:
+        enabled: false
+      
