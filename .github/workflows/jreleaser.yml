@@ -1,9 +1,10 @@
 name: JReleaser
 
-# Build on every push to main
+# Build on every semantic versioned tag
 on:
   push:
-    branches: [ master ]
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -99,14 +100,6 @@ jobs:
       # Download all collected archives
       - name: Download artifacts
         uses: actions/download-artifact@v2
-
-      # Read project version from file
-      - name: Version
-        id: version
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: VERSION
-          trim: true
 
       - name: Extract crate version
         id: crate_info
