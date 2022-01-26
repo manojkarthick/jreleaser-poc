@@ -43,7 +43,6 @@ assemble:
       attachPlatform: true
       fileSets:
         - input: 'target/{{ osPlatformReplaced }}/release'
-          output: 'bin'
           includes: [ 'jreleaser-poc{.exe,}' ]
         - input: '.'
           includes: [ 'LICENSE' ]

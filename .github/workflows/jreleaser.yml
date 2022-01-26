@@ -153,4 +153,4 @@ jobs:
           overwrite: "true"
           folder-wrapped: "true"
           universal-identifier: "all"
-          binary-path: "bin/jreleaser-poc"
+          binary-path: "jreleaser-poc"
