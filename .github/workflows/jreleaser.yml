@@ -1,4 +1,4 @@
-name: EarlyAccess
+name: JReleaser
 
 # Build on every push to main
 on:
@@ -48,13 +48,12 @@ jobs:
           command: build
           args: --locked --release --target=${{ matrix.job.target }}
 
-      # Read project version from file
-      - name: Version
-        id: version
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: VERSION
-          trim: true
+      - name: Extract crate version
+        id: crate_info
+        shell: bash
+        run: |
+          extract=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -n1)
+          echo ::set-output name=crate_version::$(echo "$extract")
 
       # Assemble the zipball
       - name: Assemble
@@ -63,7 +62,7 @@ jobs:
           version: early-access
           arguments: assemble
         env:
-          JRELEASER_PROJECT_VERSION: ${{ steps.version.outputs.content }}
+          JRELEASER_PROJECT_VERSION: ${{ steps.crate_info.outputs.crate_version }}
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JRELEASER_PLATFORM_OVERRIDE: ${{ matrix.job.jreleaser_platform }}
 
@@ -109,6 +108,13 @@ jobs:
           path: VERSION
           trim: true
 
+      - name: Extract crate version
+        id: crate_info
+        shell: bash
+        run: |
+          extract=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -n1)
+          echo ::set-output name=crate_version::$(echo "$extract")
+
       # Release it!
       - name: Release
         uses: jreleaser/release-action@v2
@@ -116,14 +122,42 @@ jobs:
           version: early-access
           arguments: release -PartifactsDir=artifacts -PskipArchiveResolver
         env:
-          JRELEASER_PROJECT_VERSION: ${{ steps.version.outputs.content }}
+          JRELEASER_PROJECT_VERSION: ${{ steps.crate_info.outputs.crate_version }}
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: JReleaser output
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: jreleaser-poc-release
+          name: output-release-logs
           path: |
             out/jreleaser/trace.log
             out/jreleaser/output.properties
+  
+  universal:
+    needs: [ release ]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Log in to Docker hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - 
+        name: Build and push universal binary
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: manojkarthick/macos-universal-binary-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          owner: "manojkarthick"
+          repository: "jreleaser-poc"
+          tag: "latest"
+          amd64: "x86_64-apple-darwin"
+          arm64: "aarch64-apple-darwin"
+          compressed: "true"
+          overwrite: "true"
+          folder-wrapped: "true"
+          universal-identifier: "all"
+          binary-path: "bin/jreleaser-poc"
