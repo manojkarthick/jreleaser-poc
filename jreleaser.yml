@@ -6,7 +6,7 @@ project:
   name: jreleaser-poc
   description: PoC for JReleaser
   longDescription: A Rust sample project for testing release process using JReleaser
-  website: https://github.com/manojkarthick/jreleaser
+  website: https://github.com/manojkarthick/jreleaser-poc
   authors:
     - Manoj Karthick
   license: MIT
@@ -18,6 +18,7 @@ platform:
     'osx-x86_64': 'x86_64-apple-darwin'
     'osx-aarch_64': 'aarch64-apple-darwin'
     'linux-x86_64': 'x86_64-unknown-linux-gnu'
+    'linux-aarch_64': 'aarch64-unknown-linux-gnu'
     'windows-x86_64': 'x86_64-pc-windows-msvc'
 
 release:
@@ -29,13 +30,15 @@ release:
       format: '- {{commitShortHash}} {{commitTitle}}'
       preset: conventional-commits
       contributors:
-        format: '- {{contributorName}}{{#contributorUsernameAsLink}} ({{.}}){{/contributorUsernameAsLink}}'
+        enabled: false
 
 assemble:
   archive:
     jreleaser-poc:
       active: ALWAYS
-      formats: [ ZIP ]
+      formats:
+        - ZIP
+        - TAR_GZ
       attachPlatform: true
       fileSets:
         - input: 'target/{{ osPlatformReplaced }}/release'
@@ -49,11 +52,13 @@ distributions:
     type: BINARY
     executableExtension: exe
     artifacts:
-      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-x86_64-apple-darwin.zip'
+      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-x86_64-apple-darwin.tar.gz'
         platform: 'osx-x86_64'
-      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-aarch64-apple-darwin.zip'
+      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-aarch64-apple-darwin.tar.gz'
         platform: 'osx-aarch_64'
-      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-x86_64-unknown-linux-gnu.zip'
+      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-x86_64-unknown-linux-gnu.tar.gz'
         platform: 'linux-x86_64'
+      - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-aarch64-unknown-linux-gnu.tar.gz'
+        platform: 'linux-aarch_64'
       - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-x86_64-pc-windows-msvc.zip'
         platform: 'windows-x86_64'

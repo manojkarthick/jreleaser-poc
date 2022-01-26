@@ -11,10 +11,11 @@ jobs:
       fail-fast: true
       matrix:
         job:
-          - { target: aarch64-apple-darwin        , os: macos-11     , jreleaser_platform: osx-aarch_64     }
-          - { target: x86_64-apple-darwin         , os: macos-11     , jreleaser_platform: osx-x86_64       }
-          - { target: x86_64-pc-windows-msvc      , os: windows-2019 , jreleaser_platform: windows-x86_64   }
-          - { target: x86_64-unknown-linux-gnu    , os: ubuntu-20.04 , jreleaser_platform: linux-x86_64     }
+          - { target: aarch64-apple-darwin        , os: macos-11     ,                  jreleaser_platform: osx-aarch_64   }
+          - { target: x86_64-apple-darwin         , os: macos-11     ,                  jreleaser_platform: osx-x86_64     }
+          - { target: x86_64-pc-windows-msvc      , os: windows-2019 ,                  jreleaser_platform: windows-x86_64 }
+          - { target: x86_64-unknown-linux-gnu    , os: ubuntu-20.04 ,                  jreleaser_platform: linux-x86_64   }
+          - { target: aarch64-unknown-linux-gnu   , os: ubuntu-20.04 , use-cross: true, jreleaser_platform: linux-aarch_64 }
     runs-on: ${{ matrix.job.os }}
 
     steps:
@@ -73,6 +74,7 @@ jobs:
           name: artifacts
           path: |
             out/jreleaser/assemble/jreleaser-poc/archive/*.zip
+            out/jreleaser/assemble/jreleaser-poc/archive/*.tar.gz
 
       - name: JReleaser output
         if: always()
