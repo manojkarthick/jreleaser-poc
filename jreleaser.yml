@@ -62,20 +62,18 @@ distributions:
         platform: 'linux-aarch_64'
       - path: '{{artifactsDir}}/{{distributionName}}-{{projectVersion}}-x86_64-pc-windows-msvc.zip'
         platform: 'windows-x86_64'
-  jreleaser-brew:
-    brew:
+
+packagers:
+  brew:
+    active: ALWAYS
+    continueOnError: false
+    formulaName: JReleaserPoC
+    multiPlatform: true
+    commitAuthor:
+      name: jreleaserbot
+      email: jreleaser@kordamp.org
+    tap:
       active: ALWAYS
-      continueOnError: false
-      formulaName: JReleaserPoC
-      multiPlatform: true
-      commitAuthor:
-        name: jreleaserbot
-        email: jreleaser@kordamp.org
-      tap:
-        active: ALWAYS
-        owner: manojkarthick
-        name: homebrew-tap
-        username: manojkarthick
-      cask:
-        enabled: false
-      
+      owner: manojkarthick
+      name: homebrew-tap
+      username: manojkarthick
