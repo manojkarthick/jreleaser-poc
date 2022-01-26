@@ -25,6 +25,7 @@ release:
   github:
     name: jreleaser-poc
     overwrite: true
+    branch: master
     changelog:
       formatted: ALWAYS
       format: '- {{commitShortHash}} {{commitTitle}}'
