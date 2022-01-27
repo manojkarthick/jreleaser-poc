@@ -114,7 +114,7 @@ jobs:
         uses: jreleaser/release-action@v2
         with:
           version: early-access
-          arguments: release -PartifactsDir=artifacts -PskipArchiveResolver
+          arguments: full-release -PartifactsDir=artifacts -PskipArchiveResolver
         env:
           JRELEASER_PROJECT_VERSION: ${{ steps.crate_info.outputs.crate_version }}
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
